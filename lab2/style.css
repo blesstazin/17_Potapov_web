@@ -1,0 +1,159 @@
+body {
+    font-family: Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: rgba(161, 104, 160, 1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+h2 {
+    font-family: Comic Sans MS;
+}
+
+header,
+footer {
+    width: 100%;
+    background: rgba(95, 176, 184, 1);
+    color: white;
+    padding: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+
+footer {
+    background: gray;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+    padding: 20px;
+    max-width: 1125px;
+    width: 100%;
+}
+
+.reasons,
+.reviews,
+.bonus {
+    background: white;
+    padding: 15px;
+    border: 3px solid black;
+    box-sizing: border-box;
+}
+
+.reasons {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.reviews {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.bonus {
+    grid-column: span 2;
+    grid-row: 2;
+    background: rgba(219, 195, 173, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bonus p {
+    margin: 5px 0;
+    line-height: 1.2;
+}
+
+.bonus img {
+    width: 150px;
+    height: auto;
+    margin: 10px;
+}
+
+.sidebar {
+    font-family: Verdana;
+    font-size: 14px;
+    width: 120px;
+    background: white;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    top: 100px;
+    left: 10px;
+    bottom: 100px;
+    border-radius: 12px;
+    max-width: 120px;
+    overflow: hidden;
+}
+
+.sidebar img {
+    width: 75%;
+    margin: 2px 0;
+    border: 5px solid green;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px;
+    max-width: 1125px;
+    width: 100%;
+}
+
+.ad-banner {
+    background: rgba(201, 34, 34, 1);
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px dashed purple;
+}
+
+@media (max-width: 920px) {
+
+    header {
+        padding: 10px 0;
+    }
+    .sidebar {
+        position: static;
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    .reasons,
+    .reviews,
+    .bonus {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .grid-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 0;
+    }
+
+    footer {
+        padding: 10px 0;
+    }
+}
