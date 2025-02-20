@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Первая лабораторная работа</title>
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: rgba(193, 165, 196, 1);
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            height: auto;
+            border-radius: 50px;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 16px;
+            color: #555;
+            font-style: italic;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        section {
+            color: rgba(112, 105, 112, 1);
+            padding: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: #4CAF50;
+            font-size: 20px;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        ul {
+            list-style-type: square;
+            margin-left: 20px;
+        }
+
+        ol {
+            list-style-type: decimal;
+            margin-left: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+            margin-top: 20px;
+        }
+
+        .facts {
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .obzor {
+            padding: 20px;
+            background-color: #eaf3e1;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .pictureright {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .opisaniepict {
+            flex: 1;
+        }
+
+        .pict img {
+            max-width: 300px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .citates {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .tablica {
+            margin-bottom: 40px;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1><em>Добро пожаловать на мой сайт!</em></h1>
+</header>
+
+<div class="container">
+
+    <section class="facts">
+        <h2>Топ 5 смешных фактов/случаев из жизни</h2>
+        <p>⚠️ Факты взяты из неизвестных источников.</p>
+        <ul>
+            <li>Когда коты начинают играть с тобой, они не хотят, чтобы ты выиграл.</li>
+            <li>Существует птица, которая ест пепел из сигарет, думая, что это соль.</li>
+            <li>Утки могут свистеть, если им очень хочется.</li>
+            <li>Котики могут запрыгивать на мебель с невероятной скоростью и с максимально странным выражением лица.</li>
+            <li>Некоторые японские магазины позволяют взять тебя в аренду на время прогулки по городу, если ты не хочешь идти один.</li>
+        </ul>
+    </section>
+
+    <section class="obzor">
+        <div class="pictureright">
+            <div class="opisaniepict">
+                <h2>Обзор последнего просмотренного фильма/сериала</h2>
+                <ul>
+                    <li><em>Название:</em> «Субстанция»</li>
+                    <li><em>Описание:</em> Фильм «Субстанция» рассказывает историю увядающей голливудской звезды Элизабет Спаркл, которая отчаянно пытается сохранить свою карьеру и молодость. Она соглашается использовать запрещённое вещество с чёрного рынка, которое обещает восстановить её молодость. Однако препарат имеет опасные побочные эффекты, и Элизабет приходится столкнуться с ужасными последствиями своего решения.</li>
+                    <li><em>Впечатления:</em> Фильм «Субстанция» производит сильное впечатление и заставляет задуматься о страхе перед старостью и потере себя. Картина обнажает главный страх людей — неотвратимую старость и потерю прежнего себя.</li>
+                </ul>
+            </div>
+            <div class="pict">
+                <img src="subs.jpg" alt="Обложка фильма «Субстанция»">
+            </div>
+        </div>
+    </section>
+
+    <section class="citates">
+        <h2>Цитаты из фильма «Славные парни»</h2>
+        <ol>
+            <li><q>Сколько себя помню, всегда мечтал быть гангстером.</q></li>
+            <li><q>Я никто! Когда я приехал сюда, я заказал спагетти с томатным соусом, а получил вермишель с кетчупом…</q></li>
+            <li><q>Сегодня всё по-другому, никакой деятельности. Я должен ждать так же, как и все остальные. Я даже не могу получить нормальную еду.</q></li>
+        </ol>
+    </section>
+
+    <section class="tablica">
+        <h2>Расписание матчей Лестера</h2>
+        <table>
+            <caption>РАСПИСАНИЕ</caption>
+            <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Противник</th>
+                <th>Итоговый счёт</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>1 февраля 2025</td>
+                <td>18:00</td>
+                <td>Эвертон</td>
+                <td>4:0</td>
+            </tr>
+            <tr>
+                <td>7 февраля 2025</td>
+                <td>23:00</td>
+                <td>Манчестер Юнайтед</td>
+                <td>2:1</td>
+            </tr>
+            <tr>
+                <td>15 февраля 2025</td>
+                <td>15:30</td>
+                <td>Арсенал</td>
+                <td>0:2</td>
+            </tr>
+            <tr>
+                <td>21 февраля 2025</td>
+                <td>23:00</td>
+                <td>Брентфорд</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>27 февраля 2025</td>
+                <td>23:00</td>
+                <td>Вест Хэм</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>9 марта 2025</td>
+                <td>17:00</td>
+                <td>Челси</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>16 марта 2025</td>
+                <td>22:00</td>
+                <td>Манчестер Юнайтед</td>
+                <td>-</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<footer>
+    <p>Тут чето пишут обычно, но я хз(</p>
+</footer>
+</body>
+</html>
