@@ -125,7 +125,7 @@ footer {
     border: 2px dashed purple;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 768px) {
 
     header {
         padding: 10px 0;
