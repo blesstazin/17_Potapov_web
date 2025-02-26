@@ -1,3 +1,5 @@
+@import url('reset.css');
+
 body {
     font-family: Verdana, sans-serif;
     margin: 0;
@@ -11,13 +13,19 @@ body {
 }
 
 h1 {
+    font-weight: 800;
     font-family: Verdana, serif;
     font-size: 24px;
     margin: 0 0;
 }
 
 h2 {
+    font-weight: 600;
     font-family: Comic Sans MS;
+}
+
+h4 {
+    font-weight: 700;
 }
 
 header,
@@ -35,16 +43,55 @@ footer {
     background: gray;
     margin-top: 20px;
     font-size: 16px;
+    bottom: 0;
+    color: white;
+    text-align: center;
+    width: 100%;
+    position: static;
+    padding: 10px 0;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-areas:    "f f z z y y"
+                            "f f z z y y"
+                            "f f i i i i"
+                            "f f i i i i";
     gap: 10px;
     padding: 20px;
-    max-width: 1125px;
+    max-width: 1200px;
     width: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+.sidebar{
+    grid-area: f;
+}
+
+.reasons{
+    grid-area: z;
+}
+
+.reviews{
+    grid-area: y;
+}
+
+.bonus{
+    grid-area: i;
 }
 
 .reasons,
@@ -56,19 +103,7 @@ footer {
     box-sizing: border-box;
 }
 
-.reasons {
-    grid-column: 1;
-    grid-row: 1;
-}
-
-.reviews {
-    grid-column: 2;
-    grid-row: 1;
-}
-
 .bonus {
-    grid-column: span 2;
-    grid-row: 2;
     background: rgba(219, 195, 173, 1);
     display: flex;
     flex-direction: column;
@@ -82,24 +117,22 @@ footer {
 
 .bonus img {
     width: 150px;
-    height: auto;
     margin: 10px;
 }
 
 .sidebar {
-    font-family: Verdana;
+    font-family: Verdana, serif;
     font-size: 14px;
     width: 120px;
     background: white;
-    padding: 10px;
+    padding: 20px 10px 30px;
     text-align: center;
-    position: fixed;
-    top: 100px;
-    left: 10px;
-    bottom: 100px;
     border-radius: 12px;
     max-width: 120px;
     overflow: hidden;
+    height: auto;
+    display: grid;
+    place-items: center;
 }
 
 .sidebar img {
@@ -113,7 +146,8 @@ footer {
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 20px;
-    max-width: 1125px;
+    max-width: 1200px;
+    box-sizing: border-box;
     width: 100%;
 }
 
@@ -130,13 +164,56 @@ footer {
     header {
         padding: 10px 0;
     }
+
     .sidebar {
-        position: static;
-        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        width: 85%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
         text-align: center;
-        margin-top: 10px;
+        align-items: center;
+        grid-template-areas: "title title"
+                             "text1 text2"
+                             "img1 img2";
+    }
+    
+    .sidebar h4 {
+        grid-area: title;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+    .text1 {
+        grid-area: text1;
+    }
+    
+    .text2 {
+        grid-area: text2;
+    }
+    
+    .img1 {
+        grid-area: img1;
+    }
+    
+    .img2 {
+        grid-area: img2;
+    }
+    
+    .sidebar img {
+        width: 80px;
+        border: 2px solid green;
+        justify-self: center;
+        display: inline-block;
     }
 
+    .sidebar p {
+        text-align: center;
+        display: inline-block;
+    }
+    
     .container {
         display: flex;
         flex-direction: column;
@@ -155,11 +232,12 @@ footer {
     .grid-container {
         display: flex;
         flex-direction: column;
-        width: 100%;
         padding: 0;
     }
+}
 
-    footer {
-        padding: 10px 0;
+@media (min-width: 1921px) {
+    body {
+        font-size: 18px;
     }
 }
