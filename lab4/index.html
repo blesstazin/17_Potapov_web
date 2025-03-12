@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/index.css">
+    <title>Шапка-Магнит для Денег</title>
+  </head>
+  <body>
+    <header>
+      <h1>«Шапка-магнит для денег» – СТАНЬ БОГАТЫМ УЖЕ СЕГОДНЯ!!!</h1>
+    </header>
+    <button id="theme-toggle" class="theme-toggle">Переключить тему</button>
+    <main>
+      <div class="container">
+        <div class="sidebar">
+          <h4>❗️РЕКЛАМА</h4>
+          <p class="text1"><em>✈️ Самые дешевые билеты на Aviasales</em></p>
+          <img class="img1" src="img/photo1.jpg" alt="Реклама">
+          <p class="text2"><em>🙏 Надевай шлем, когда катаешься на доске</em></p>
+          <img class="img2" src="img/photo2.png" alt="Реклама">
+        </div>
+
+        <section class="reasons">
+          <h2>Топ-5 причин купить наш товар</h2>
+          <div class="reasons-list">
+            <li>1. Притягивает деньги (точно не от шапки)</li>
+            <li>2. Крайне стильная (если не выходить из дома)</li>
+            <li>3. Работает без батареек (потому что не работает)</li>
+            <li>4. Гарантия 3 дня (быстро может стать 3 часами)</li>
+            <li>5. Покупай сейчас и получишь воздух бесплатно</li>
+          </div>
+        </section>
+
+        <section class="bonus">
+          <h2>БОНУС! Только сегодня! Специальное предложение!</h2>
+          <p>Получите талисман «Счастливая монетка» абсолютно БЕСПЛАТНО при покупке 2-х шапок!</p>
+          <p>К сожалению, кроме как дешевого пластика, других функций монетка не предоставляет.</p>
+          <div class="bonus-img">
+            <img src="img/monetka.png" alt="Счастливая монетка">
+          </div>
+        </section>
+
+        <section class="reviews">
+          <h2>Отзывы любимых пользователей</h2>
+          <div class="review-controls">
+            <label for="sort-reviews">Сортировать по:</label>
+            <select id="sort-reviews">
+              <option value="rating-desc">Рейтинг (убывание)</option>
+              <option value="rating-asc">Рейтинг (возрастание)</option>
+              <option value="name">Имя</option>
+            </select>
+            <br><br><label for="filter-reviews">Фильтр по рейтингу:</label>
+            <input type="number" id="filter-reviews" min="1" max="5" placeholder="1-5">
+          </div>
+          <div id="review-list"></div>
+          <form id="review-form">
+            <h3>Оставить отзыв</h3>
+            <input type="text" id="review-name" placeholder="Ваше имя" required>
+            <textarea id="review-text" placeholder="Ваш отзыв" required></textarea>
+            <input type="number" id="review-rating" min="1" max="5" placeholder="Оценка (1-5)" required>
+            <button type="submit">Отправить</button>
+          </form>
+        </section>
+      </div>
+
+      <div class="grid-container">
+        <div class="ad-banner">🔥 СПЕЦИАЛЬНО ДЛЯ ВАС! КУПИ СЕЙЧАС И НЕ ПОЖАЛЕЕШЬ! 🔥</div>
+        <div class="ad-banner">💰 ВСЕГО 9999 РУБЛЕЙ! ЭТО ПОЧТИ ДАРОМ! 💰</div>
+        <div class="ad-banner">🎩 ДОБАВЬ СТИЛЯ! СТАНЬ МАГНИТОМ ДЛЯ ДЕНЕГ! 🎩</div>
+      </div>
+    </main>
+
+    <footer>
+      © 2025 Ваши права ни в коем случае не защищены. Не ведитесь на этот сайт!
+    </footer>
+    <script src="js/index.js"></script>
+  </body>
+</html>
