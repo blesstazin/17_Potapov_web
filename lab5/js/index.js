@@ -22,11 +22,11 @@ class HeaderBlock extends Block {
 
     getHTML() {
         return `
-            <div class="header-block" id="${this._id}">
+            <header class="header-block" id="${this._id}">
                 <img src="${this._imageUrl}" alt="${this._name}">
                 <h1>${this._name}</h1>
                 <p>${this._title}</p>
-            </div>
+            </header>
         `;
     }
 }
@@ -43,11 +43,11 @@ class StatsBlock extends Block {
             .map(([key, value]) => `<li>${key}: ${value}</li>`)
             .join('');
         return `
-            <div class="stats-block" id="${this._id}">
+            <section class="stats-block" id="${this._id}">
                 <h2>Информация</h2>
                 <ul>${statsList}</ul>
                 <p>${this._bio}</p>
-            </div>
+            </section>
         `;
     }
 }
@@ -63,10 +63,10 @@ class CollabsBlock extends Block {
             .map(collab => `<li>${collab}</li>`)
             .join('');
         return `
-            <div class="collabs-block" id="${this._id}">
+            <section class="collabs-block" id="${this._id}">
                 <h2>Коллаборации</h2>
                 <ul>${collabsList}</ul>
-            </div>
+            </section>
         `;
     }
 }
@@ -87,10 +87,10 @@ class AlbumsBlock extends Block {
             `)
             .join('');
         return `
-            <div class="albums-block" id="${this._id}">
+            <section class="albums-block" id="${this._id}">
                 <h2>Популярные альбомы</h2>
                 <ul>${albumsList}</ul>
-            </div>
+            </section>
         `;
     }
 }
@@ -106,10 +106,10 @@ class QuotesBlock extends Block {
             .map(quote => `<li>"${quote}"</li>`)
             .join('');
         return `
-            <div class="quotes-block" id="${this._id}">
+            <section class="quotes-block" id="${this._id}">
                 <h2>Цитаты из песен</h2>
                 <ul>${quotesList}</ul>
-            </div>
+            </section>
         `;
     }
 }
@@ -123,9 +123,9 @@ class FooterBlock extends Block {
 
     getHTML() {
         return `
-            <div class="footer-block" id="${this._id}">
+            <footer class="footer-block" id="${this._id}">
                 <p>${this._text} | <a href="${this._link}" target="_blank">Слушать на YandexMusic</a></p>
-            </div>
+            </footer>
         `;
     }
 }
@@ -179,8 +179,14 @@ function buildSite() {
         'https://music.yandex.ru/artist/16509384'
     );
 
-    const blocks = [header, stats, collabs, albums, quotes, footer];
-    const htmlContent = blocks.map(block => block.getHTML()).join('');
+    const blocks = [stats, collabs, albums, quotes];
+    const htmlContent = `
+        ${header.getHTML()}
+        <main>
+            ${blocks.map(block => block.getHTML()).join('')}
+        </main>
+        ${footer.getHTML()}
+    `;
     document.body.innerHTML = htmlContent;
 }
 
