@@ -130,64 +130,80 @@ class FooterBlock extends Block {
     }
 }
 
-function buildSite() {
-    const header = new HeaderBlock(
-        'header',
-        'Kai Angel',
-        'Российский рэпер',
-        '../img/kai-angel.jpg'
-    );
-    const stats = new StatsBlock(
-        'stats',
-        {
-            'Настоящее имя': 'Дмитрий Ицков',
-            'Дата рождения': '4 февраля 1997',
-            'Город': 'Брянск, Россия',
-            'Жанр': 'Хип-хоп / Рэп'
-        },
-        'Kai Angel — российский рэп-исполнитель, продюсер и участник дуэта VIPERR. Известен своим уникальным стилем и мрачной эстетикой.'
-    );
-    const collabs = new CollabsBlock(
-        'collabs',
-        [
-            '9mice - "LIPSTICK"',
-            '9mice - "ОТРАВЛЕН ТОБОЙ"',
-            '9mice - "HEAVY METAL"',
-            '9mice - "Phoenix"',
-            '9mice - "Ринопластика"'
-        ]
-    );
-    const albums = new AlbumsBlock(
-        'albums',
-        [
-            { title: 'Heavy Metal 2', cover: '../img/heavy-metal-2.jpg' },
-            { title: 'GOD SYSTEM', cover: '../img/god-system.jpg' },
-            { title: 'ANGEL MAY CRY', cover: '../img/angel-may-cry.jpg' }
-        ]
-    );
-    const quotes = new QuotesBlock(
-        'quotes',
-        [
-            'Она в моей голове навсегда (навсегда)',
-            'Сколько можно быть тут одному? — я задаю себе question',
-            'Красный свет в глазах, я живу во тьме'
-        ]
-    );
-    const footer = new FooterBlock(
-        'footer',
-        'Kai Angel — восходящая звезда российской сцены',
-        'https://music.yandex.ru/artist/16509384'
-    );
+function loadBlocks() {
+    const savedData = localStorage.getItem('kaiAngelBlocks');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        return data.map(item => {
+            switch (item.type) {
+                case 'header': return new HeaderBlock(item.id, item.name, item.title, item.imageUrl);
+                case 'stats': return new StatsBlock(item.id, item.stats, item.bio);
+                case 'collabs': return new CollabsBlock(item.id, item.collabs);
+                case 'albums': return new AlbumsBlock(item.id, item.albums);
+                case 'quotes': return new QuotesBlock(item.id, item.quotes);
+                case 'footer': return new FooterBlock(item.id, item.text, item.link);
+            }
+        });
+    }
+    return null;
+}
 
-    const blocks = [stats, collabs, albums, quotes];
+function saveBlocks(blocks) {
+    const data = blocks.map(block => {
+        if (block instanceof HeaderBlock) return { type: 'header', id: block._id, name: block._name, title: block._title, imageUrl: block._imageUrl };
+        if (block instanceof StatsBlock) return { type: 'stats', id: block._id, stats: block._stats, bio: block._bio };
+        if (block instanceof CollabsBlock) return { type: 'collabs', id: block._id, collabs: block._collabs };
+        if (block instanceof AlbumsBlock) return { type: 'albums', id: block._id, albums: block._albums };
+        if (block instanceof QuotesBlock) return { type: 'quotes', id: block._id, quotes: block._quotes };
+        if (block instanceof FooterBlock) return { type: 'footer', id: block._id, text: block._text, link: block._link };
+    });
+    localStorage.setItem('kaiAngelBlocks', JSON.stringify(data));
+}
+
+function buildSite() {
+    let blocks = loadBlocks();
+    if (!blocks) {
+        blocks = [
+            new HeaderBlock('header', 'Kai Angel', 'Российский рэпер', '../img/kai-angel.jpg'),
+            new StatsBlock('stats', {
+                'Настоящее имя': 'Дмитрий Ицков',
+                'Дата рождения': '4 февраля 1997',
+                'Город': 'Брянск, Россия',
+                'Жанр': 'Хип-хоп / Рэп'
+            }, 'Kai Angel — российский рэп-исполнитель, продюсер и участник дуэта VIPERR. Известен своим уникальным стилем и мрачной эстетикой.'),
+            new CollabsBlock('collabs', [
+                '9mice - "LIPSTICK"',
+                '9mice - "ОТРАВЛЕН ТОБОЙ"',
+                '9mice - "HEAVY METAL"',
+                '9mice - "Phoenix"',
+                '9mice - "Ринопластика"'
+            ]),
+            new AlbumsBlock('albums', [
+                { title: 'Heavy Metal 2', cover: '../img/heavy-metal-2.jpg' },
+                { title: 'GOD SYSTEM', cover: '../img/god-system.jpg' },
+                { title: 'ANGEL MAY CRY', cover: '../img/angel-may-cry.jpg' }
+            ]),
+            new QuotesBlock('quotes', [
+                'Она в моей голове навсегда (навсегда)',
+                'Сколько можно быть тут одному? — я задаю себе question',
+                'Красный свет в глазах, я живу во тьме'
+            ]),
+            new FooterBlock('footer', 'Kai Angel — восходящая звезда российской сцены', 'https://music.yandex.ru/artist/16509384')
+        ];
+    }
+
+    const mainBlocks = blocks.filter(block => !(block instanceof HeaderBlock) && !(block instanceof FooterBlock));
+    const headerBlock = blocks.find(block => block instanceof HeaderBlock);
+    const footerBlock = blocks.find(block => block instanceof FooterBlock);
     const htmlContent = `
-        ${header.getHTML()}
+        ${headerBlock.getHTML()}
         <main>
-            ${blocks.map(block => block.getHTML()).join('')}
+            ${mainBlocks.map(block => block.getHTML()).join('')}
         </main>
-        ${footer.getHTML()}
+        ${footerBlock.getHTML()}
     `;
     document.body.innerHTML = htmlContent;
+    saveBlocks(blocks);
 }
 
 window.addEventListener('DOMContentLoaded', buildSite);
