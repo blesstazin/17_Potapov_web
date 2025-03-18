@@ -95,6 +95,24 @@ class AlbumsBlock extends Block {
     }
 }
 
+class TicketBlock extends Block {
+    constructor(id, imageUrl) {
+        super(id);
+        this._imageUrl = imageUrl;
+    }
+
+    getHTML() {
+        return `
+            <section class="ticket-block" id="${this._id}">
+                <h2>Желанный многими билет на Kai Angel</h2>
+                <div class="ticket-wrapper">
+                    <img src="${this._imageUrl}" alt="Билет на концерт Kai Angel">
+                </div>
+            </section>
+        `;
+    }
+}
+
 class QuotesBlock extends Block {
     constructor(id, quotes) {
         super(id);
@@ -140,6 +158,7 @@ function loadBlocks() {
                 case 'stats': return new StatsBlock(item.id, item.stats, item.bio);
                 case 'collabs': return new CollabsBlock(item.id, item.collabs);
                 case 'albums': return new AlbumsBlock(item.id, item.albums);
+                case 'ticket': return new TicketBlock(item.id, item.imageUrl);
                 case 'quotes': return new QuotesBlock(item.id, item.quotes);
                 case 'footer': return new FooterBlock(item.id, item.text, item.link);
             }
@@ -154,13 +173,14 @@ function saveBlocks(blocks) {
         if (block instanceof StatsBlock) return { type: 'stats', id: block._id, stats: block._stats, bio: block._bio };
         if (block instanceof CollabsBlock) return { type: 'collabs', id: block._id, collabs: block._collabs };
         if (block instanceof AlbumsBlock) return { type: 'albums', id: block._id, albums: block._albums };
+        if (block instanceof TicketBlock) return { type: 'ticket', id: block._id, imageUrl: block._imageUrl };
         if (block instanceof QuotesBlock) return { type: 'quotes', id: block._id, quotes: block._quotes };
         if (block instanceof FooterBlock) return { type: 'footer', id: block._id, text: block._text, link: block._link };
     });
     localStorage.setItem('kaiAngelBlocks', JSON.stringify(data));
 }
 
-function buildSite() {
+function buildSite(playMusic = false) {
     let blocks = loadBlocks();
     if (!blocks) {
         blocks = [
@@ -176,13 +196,15 @@ function buildSite() {
                 '9mice - "ОТРАВЛЕН ТОБОЙ"',
                 '9mice - "HEAVY METAL"',
                 '9mice - "Phoenix"',
-                '9mice - "Ринопластика"'
+                '9mice - "Ринопластика"',
+                'Егор Крид, 9mice - "HELL"'
             ]),
             new AlbumsBlock('albums', [
                 { title: 'Heavy Metal 2', cover: '../img/heavy-metal-2.jpg' },
                 { title: 'GOD SYSTEM', cover: '../img/god-system.jpg' },
                 { title: 'ANGEL MAY CRY', cover: '../img/angel-may-cry.jpg' }
             ]),
+            new TicketBlock('ticket', '../img/kai-angel-ticket.jpg'),
             new QuotesBlock('quotes', [
                 'Она в моей голове навсегда (навсегда)',
                 'Сколько можно быть тут одному? — я задаю себе question',
@@ -195,15 +217,41 @@ function buildSite() {
     const mainBlocks = blocks.filter(block => !(block instanceof HeaderBlock) && !(block instanceof FooterBlock));
     const headerBlock = blocks.find(block => block instanceof HeaderBlock);
     const footerBlock = blocks.find(block => block instanceof FooterBlock);
+
     const htmlContent = `
         ${headerBlock.getHTML()}
         <main>
             ${mainBlocks.map(block => block.getHTML()).join('')}
         </main>
         ${footerBlock.getHTML()}
+        ${playMusic ? '<audio id="background-music" autoplay loop src="../audio/kai-angel-otravlen.mp3"></audio>' : ''}
     `;
     document.body.innerHTML = htmlContent;
     saveBlocks(blocks);
 }
 
-window.addEventListener('DOMContentLoaded', buildSite);
+function showIntroPopup() {
+    const popupHTML = `
+        <div id="intro-popup" class="popup">
+            <div class="popup-content">
+                <h2>Погрузиться глубже?</h2>
+                <p class="warning">⚠️ Внимание: при нажатии на кнопку "Да", Вы автоматически соглашаетесь с тем, что сейчас может быть воспроизведена ненормативная лексика!</p>
+                <button id="yes-btn">Да (убавьте звук, если он на максимуме)</button>
+                <button id="no-btn">Нет (очень жаль)</button>
+            </div>
+        </div>
+    `;
+    document.body.innerHTML = popupHTML;
+
+    document.getElementById('yes-btn').addEventListener('click', () => {
+        buildSite(true);
+    });
+
+    document.getElementById('no-btn').addEventListener('click', () => {
+        buildSite(false);
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    showIntroPopup();
+});
