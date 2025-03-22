@@ -184,7 +184,7 @@ function buildSite(playMusic = false) {
     let blocks = loadBlocks();
     if (!blocks) {
         blocks = [
-            new HeaderBlock('header', 'Kai Angel', 'Российский рэпер', '../img/kai-angel.jpg'),
+            new HeaderBlock('header', 'Kai Angel', 'Российский рэпер', 'img/kai_angel.jpg'),
             new StatsBlock('stats', {
                 'Настоящее имя': 'Дмитрий Ицков',
                 'Дата рождения': '4 февраля 1997',
@@ -196,15 +196,14 @@ function buildSite(playMusic = false) {
                 '9mice - "ОТРАВЛЕН ТОБОЙ"',
                 '9mice - "HEAVY METAL"',
                 '9mice - "Phoenix"',
-                '9mice - "Ринопластика"',
-                'Егор Крид, 9mice - "HELL"'
+                '9mice - "Ринопластика"'
             ]),
             new AlbumsBlock('albums', [
-                { title: 'Heavy Metal 2', cover: '../img/heavy-metal-2.jpg' },
-                { title: 'GOD SYSTEM', cover: '../img/god-system.jpg' },
-                { title: 'ANGEL MAY CRY', cover: '../img/angel-may-cry.jpg' }
+                { title: 'Heavy Metal 2', cover: 'img/heavy_metal_2.jpg' },
+                { title: 'GOD SYSTEM', cover: 'img/god_system.jpg' },
+                { title: 'ANGEL MAY CRY', cover: 'img/angel_may_cry.jpg' }
             ]),
-            new TicketBlock('ticket', '../img/kai-angel-ticket.jpg'),
+            new TicketBlock('ticket', 'img/kai_angel_ticket.jpg'),
             new QuotesBlock('quotes', [
                 'Она в моей голове навсегда (навсегда)',
                 'Сколько можно быть тут одному? — я задаю себе question',
@@ -224,7 +223,7 @@ function buildSite(playMusic = false) {
             ${mainBlocks.map(block => block.getHTML()).join('')}
         </main>
         ${footerBlock.getHTML()}
-        ${playMusic ? '<audio id="background-music" autoplay loop src="../audio/kai-angel-otravlen.mp3"></audio>' : ''}
+        ${playMusic ? '<audio id="background-music" autoplay loop src="audio/kai_angel_otravlen.mp3"></audio>' : ''}
     `;
     document.body.innerHTML = htmlContent;
     saveBlocks(blocks);
