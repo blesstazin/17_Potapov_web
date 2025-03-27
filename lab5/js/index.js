@@ -196,7 +196,8 @@ function buildSite(playMusic = false) {
                 '9mice - "ОТРАВЛЕН ТОБОЙ"',
                 '9mice - "HEAVY METAL"',
                 '9mice - "Phoenix"',
-                '9mice - "Ринопластика"'
+                '9mice - "Ринопластика"',
+                'Егор Крид, 9mice - "HELL"'
             ]),
             new AlbumsBlock('albums', [
                 { title: 'Heavy Metal 2', cover: './img/heavy_metal_2.jpg' },
@@ -250,6 +251,7 @@ function showIntroPopup() {
         buildSite(false);
     });
 }
+
 
 window.addEventListener('DOMContentLoaded', () => {
     showIntroPopup();
