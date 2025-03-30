@@ -1,38 +1,58 @@
 import React, { useContext } from 'react';
 import { ApiContext } from '../context/ApiContext';
 
+const config = {
+    countries: {
+        promptLabel: 'название',
+        display: item => `${item.name.common} - ${item.capital?.[0] || 'Нет столицы'}`,
+        methods: ['get']
+    },
+    users: {
+        promptLabel: 'имя',
+        display: item => `${item.first_name} ${item.last_name} (ID: ${item.id}${item.isCustom ? ', Созданный' : ''})`,
+        methods: ['get', 'post', 'put', 'patch', 'delete']
+    },
+    products: {
+        promptLabel: 'название',
+        display: item => `${item.title} (ID: ${item.id}) [${item.price || 0} $]${item.isCustom ? ' (Созданный)' : ''}`,
+        methods: ['get', 'post', 'put', 'patch', 'delete'],
+        patchLabel: 'цену'
+    }
+};
+
 const ApiSection = ({ apiKey, title }) => {
     const { countries, users, products, apiHandlers, loading } = useContext(ApiContext);
     const data = { countries, users, products }[apiKey];
     const isLoading = loading[apiKey];
+    const apiConf = config[apiKey];
 
     const handleAction = async (method, id = null, value = null) => {
-        if (method === 'get') {
-            await apiHandlers[apiKey].get();
-        } else if (method === 'post') {
-            const input = prompt(`Введите ${apiKey === 'users' ? 'имя' : 'название'}:`) || 'Kai';
-            await apiHandlers[apiKey].post(input);
-        } else if (method === 'put') {
-            const id = prompt('Введите ID для обновления:');
-            if (!id) return;
-            const value = prompt(`Введите новое ${apiKey === 'users' ? 'имя' : 'название'}:`);
-            if (!value) return;
-            await apiHandlers[apiKey].put(id, value);
-        } else if (method === 'patch') {
-            const promptText = apiKey === 'products' ? 'цену' : 'имя';
-            if (!id) {
-                const customId = prompt('Введите ID для изменения:');
-                if (!customId) return;
+        const actions = {
+            get: () => apiHandlers[apiKey].get(),
+            post: async () => {
+                const input = prompt(`Введите ${apiConf.promptLabel}:`) || 'Kai';
+                await apiHandlers[apiKey].post(input);
+            },
+            put: async () => {
+                const inputId = prompt('Введите ID для обновления:');
+                if (!inputId) return;
+                const inputValue = prompt(`Введите новое ${apiConf.promptLabel}:`);
+                if (!inputValue) return;
+                await apiHandlers[apiKey].put(inputId, inputValue);
+            },
+            patch: async (patchId = id) => {
+                const promptText = apiConf.patchLabel || apiConf.promptLabel;
+                const effectiveId = patchId || prompt('Введите ID для изменения:');
+                if (!effectiveId) return;
                 const newValue = prompt(`Введите новое ${promptText}:`);
                 if (!newValue) return;
-                await apiHandlers[apiKey].patch(customId, newValue);
-            } else {
-                const newValue = prompt(`Введите новое ${promptText}:`);
-                if (!newValue) return;
-                await apiHandlers[apiKey].patch(id, newValue);
-            }
-        } else if (method === 'delete') {
-            await apiHandlers[apiKey].delete(id);
+                await apiHandlers[apiKey].patch(effectiveId, newValue);
+            },
+            delete: () => apiHandlers[apiKey].delete(id)
+        };
+
+        if (actions[method]) {
+            await actions[method]();
         }
     };
 
@@ -41,12 +61,14 @@ const ApiSection = ({ apiKey, title }) => {
             <p className="api-warning">Внимание, API абсолютно рандомные и отношения к сайту практически не имеют!!!</p>
             <h2>{title}</h2>
             <div className="controls">
-                <button onClick={() => handleAction('get')}>GET</button>
-                {apiKey !== 'countries' && (
-                    <>
-                        <button onClick={() => handleAction('post')}>POST</button>
-                        <button onClick={() => handleAction('put')}>PUT</button>
-                    </>
+                {apiConf.methods.includes('get') && (
+                    <button onClick={() => handleAction('get')}>GET</button>
+                )}
+                {apiConf.methods.includes('post') && (
+                    <button onClick={() => handleAction('post')}>POST</button>
+                )}
+                {apiConf.methods.includes('put') && (
+                    <button onClick={() => handleAction('put')}>PUT</button>
                 )}
             </div>
             <ul>
@@ -57,10 +79,8 @@ const ApiSection = ({ apiKey, title }) => {
                 ) : (
                     data.map(item => (
                         <li key={item.id || item.name?.common}>
-                            {apiKey === 'countries' && `${item.name.common} - ${item.capital?.[0] || 'Нет столицы'}`}
-                            {apiKey === 'users' && `${item.first_name} ${item.last_name} (ID: ${item.id}${item.isCustom ? ', Созданный' : ''})`}
-                            {apiKey === 'products' && `${item.title} (ID: ${item.id}) [${item.price || 0} $]${item.isCustom ? ' (Созданный)' : ''}`}
-                            {apiKey !== 'countries' && (
+                            {apiConf.display(item)}
+                            {apiConf.methods.includes('patch') && (
                                 <>
                                     <button
                                         className="patch-btn"

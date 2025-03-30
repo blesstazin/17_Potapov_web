@@ -2,7 +2,6 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const ApiContext = createContext();
 
-// Конфигурация API
 const apiConfig = {
     countries: {
         url: 'https://restcountries.com/v3.1/all?fields=name,capital',
@@ -45,7 +44,7 @@ export const ApiProvider = ({ children }) => {
             const rawData = await res.json();
             const transformedData = config.transform ? config.transform(rawData) : rawData;
             setData(prev => ({ ...prev, [key]: transformedData }));
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Задержка для наглядности
+            await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
             console.error(`Ошибка при загрузке ${key}:`, error);
         } finally {
