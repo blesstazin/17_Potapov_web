@@ -68,6 +68,31 @@ body::before {
     border: 1px solid #cc0000;
 }
 
+.api-section li button {
+    margin-left: 10px;
+    background: #ff3333;
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.api-section li button:hover {
+    background: #cc0000;
+    box-shadow: 0 0 5px #ff0000;
+}
+
+.api-section .controls span {
+    font-size: 18px;
+    color: #ff9999;
+    margin: 0 10px;
+    line-height: 34px;
+}
+
 .api-section h2 {
     font-size: 40px;
     color: #ff0000;

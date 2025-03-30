@@ -148,180 +148,390 @@ class FooterBlock extends Block {
     }
 }
 
-function setupCountriesSection() {
-    const countriesList = document.getElementById('countries-list');
-    const loader = document.querySelector('#countries-section .loader');
-    const getButton = document.querySelector('#countries-section button[data-method="get"]');
+const apiHandlers = {
+    countries: {
+        url: 'https://restcountries.com/v3.1/all?fields=name,capital',
+        methods: {
+            get: async (listElement) => {
+                const response = await fetch('https://restcountries.com/v3.1/all?fields=name,capital', {
+                    method: 'GET'
+                });
+                const data = await response.json();
+                const limitedData = data.slice(0, 5);
+                listElement.innerHTML = limitedData.map(country => `<li>${country.name.common} - ${country.capital?.[0] || 'Нет столицы'}</li>`).join('');
+            }
+        }
+    },
+    users: {
+        url: 'https://reqres.in/api/users',
+        methods: {
+            get: async (listElement) => {
+                const response = await fetch('https://reqres.in/api/users?per_page=5', {
+                    method: 'GET'
+                });
+                const { data } = await response.json();
+                listElement.innerHTML = data.map(user => `
+                    <li>
+                        ${user.first_name} ${user.last_name} (ID: ${user.id}${user.isCustom ? ', Созданный' : ''})
+                        ${!user.isCustom ? `
+                            <button class="patch-btn" data-id="${user.id}">Изменить</button>
+                            <button class="delete-btn" data-id="${user.id}">Удалить</button>
+                        ` : ''}
+                    </li>
+                `).join('');
+            },
+            post: async (listElement) => {
+                const name = prompt('Введите имя нового пользователя (Внимание: созданных пользователей нельзя будет изменить или удалить):') || 'Kai';
+                const response = await fetch('https://reqres.in/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                const newUser = await response.json();
+                const nameParts = name.split(' ');
+                const formattedUser = {
+                    id: newUser.id || Date.now(),
+                    first_name: nameParts[0],
+                    last_name: nameParts[1] || '',
+                    isCustom: true
+                };
+                const updatedResponse = await fetch('https://reqres.in/api/users?per_page=5', { method: 'GET' });
+                const { data } = await updatedResponse.json();
+                data.unshift(formattedUser);
+                listElement.innerHTML = data.slice(0, 5).map(user => `
+                    <li>
+                        ${user.first_name} ${user.last_name} (ID: ${user.id}${user.isCustom ? ', Созданный' : ''})
+                        ${!user.isCustom ? `
+                            <button class="patch-btn" data-id="${user.id}">Изменить</button>
+                            <button class="delete-btn" data-id="${user.id}">Удалить</button>
+                        ` : ''}
+                    </li>
+                `).join('');
+            },
+            put: async (listElement) => {
+                const id = prompt('Введите ID пользователя для обновления:');
+                if (!id) return;
+                const newName = prompt('Введите новое имя:');
+                if (!newName) return;
 
-    getButton.addEventListener('click', async () => {
-        countriesList.innerHTML = '<li>Выполняется...</li>';
+                const response = await fetch(`https://reqres.in/api/users/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName })
+                });
+                const updatedUser = await response.json();
+                const updatedResponse = await fetch('https://reqres.in/api/users?per_page=5', { method: 'GET' });
+                const { data } = await updatedResponse.json();
+                const userIndex = data.findIndex(user => user.id === parseInt(id));
+                if (userIndex !== -1 && !data[userIndex].isCustom) {
+                    const nameParts = newName.split(' ');
+                    data[userIndex] = {
+                        ...data[userIndex],
+                        first_name: nameParts[0],
+                        last_name: nameParts[1] || ''
+                    };
+                }
+                listElement.innerHTML = data.map(user => `
+                    <li>
+                        ${user.first_name} ${user.last_name} (ID: ${user.id}${user.isCustom ? ', Созданный' : ''})
+                        ${!user.isCustom ? `
+                            <button class="patch-btn" data-id="${user.id}">Изменить</button>
+                            <button class="delete-btn" data-id="${user.id}">Удалить</button>
+                        ` : ''}
+                    </li>
+                `).join('');
+            },
+            patch: async (listElement, id) => {
+                const userResponse = await fetch(`https://reqres.in/api/users/${id}`, { method: 'GET' });
+                const user = await userResponse.json();
+                if (user.isCustom) {
+                    alert('Нельзя изменить созданного пользователя!');
+                    return;
+                }
 
+                const newName = prompt('Введите новое имя:');
+                if (!newName) return;
+
+                const response = await fetch(`https://reqres.in/api/users/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName })
+                });
+                const updatedUser = await response.json();
+
+                const updatedResponse = await fetch('https://reqres.in/api/users?per_page=5', { method: 'GET' });
+                const { data } = await updatedResponse.json();
+                const userIndex = data.findIndex(user => user.id === parseInt(id));
+                if (userIndex !== -1) {
+                    data[userIndex].first_name = newName;
+                }
+                listElement.innerHTML = data.map(user => `
+                    <li>
+                        ${user.first_name} ${user.last_name} (ID: ${user.id}${user.isCustom ? ', Созданный' : ''})
+                        ${!user.isCustom ? `
+                            <button class="patch-btn" data-id="${user.id}">Изменить</button>
+                            <button class="delete-btn" data-id="${user.id}">Удалить</button>
+                        ` : ''}
+                    </li>
+                `).join('');
+            },
+            delete: async (listElement, id) => {
+                const userResponse = await fetch(`https://reqres.in/api/users/${id}`, { method: 'GET' });
+                const user = await userResponse.json();
+                if (user.isCustom) {
+                    alert('Нельзя удалить созданного пользователя!');
+                    return;
+                }
+
+                await fetch(`https://reqres.in/api/users/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const updatedResponse = await fetch('https://reqres.in/api/users?per_page=5', { method: 'GET' });
+                const { data } = await updatedResponse.json();
+                listElement.innerHTML = data.map(user => `
+                    <li>
+                        ${user.first_name} ${user.last_name} (ID: ${user.id}${user.isCustom ? ', Созданный' : ''})
+                        ${!user.isCustom ? `
+                            <button class="patch-btn" data-id="${user.id}">Изменить</button>
+                            <button class="delete-btn" data-id="${user.id}">Удалить</button>
+                        ` : ''}
+                    </li>
+                `).join('');
+            }
+        }
+    },
+    products: {
+        url: 'https://dummyjson.com/products',
+        methods: {
+            get: async (listElement) => {
+                const response = await fetch('https://dummyjson.com/products?limit=5', {
+                    method: 'GET'
+                });
+                const { products } = await response.json();
+                listElement.innerHTML = products.map(product => `
+                    <li>
+                        ${product.title} (ID: ${product.id}) [${product.price || 0} $]
+                        <button class="patch-btn" data-id="${product.id}">Изменить</button>
+                        <button class="delete-btn" data-id="${product.id}">Удалить</button>
+                    </li>
+                `).join('');
+            },
+            post: async (listElement) => {
+                const title = prompt('Введите название нового продукта:') || 'зипочка vetements';
+                const response = await fetch('https://dummyjson.com/products/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title })
+                });
+                const newProduct = await response.json();
+                newProduct.price = newProduct.price || 0;
+
+                const updatedResponse = await fetch('https://dummyjson.com/products?limit=5', { method: 'GET' });
+                const { products } = await updatedResponse.json();
+                products.unshift(newProduct);
+                listElement.innerHTML = products.map(product => `
+                    <li>
+                        ${product.title} (ID: ${product.id}) [${product.price || 0} $]
+                        <button class="patch-btn" data-id="${product.id}">Изменить</button>
+                        <button class="delete-btn" data-id="${product.id}">Удалить</button>
+                    </li>
+                `).join('');
+            },
+            put: async (listElement) => {
+                const id = prompt('Введите ID продукта для обновления:');
+                if (!id) return;
+                const newTitle = prompt('Введите новое название:');
+                if (!newTitle) return;
+
+                const response = await fetch(`https://dummyjson.com/products/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newTitle })
+                });
+                const updatedProduct = await response.json();
+                const updatedResponse = await fetch('https://dummyjson.com/products?limit=5', { method: 'GET' });
+                const { products } = await updatedResponse.json();
+                const productIndex = products.findIndex(product => product.id === parseInt(id));
+                if (productIndex !== -1) {
+                    products[productIndex] = updatedProduct;
+                }
+                listElement.innerHTML = products.map(product => `
+                    <li>
+                        ${product.title} (ID: ${product.id}) [${product.price || 0} $]
+                        <button class="patch-btn" data-id="${product.id}">Изменить</button>
+                        <button class="delete-btn" data-id="${product.id}">Удалить</button>
+                    </li>
+                `).join('');
+            },
+            patch: async (listElement, id) => {
+                const newPrice = prompt('Введите новую цену:');
+                if (!newPrice) return;
+
+                const response = await fetch(`https://dummyjson.com/products/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: parseInt(newPrice) })
+                });
+                const updatedProduct = await response.json();
+                const updatedResponse = await fetch('https://dummyjson.com/products?limit=5', { method: 'GET' });
+                const { products } = await updatedResponse.json();
+                const productIndex = products.findIndex(product => product.id === parseInt(id));
+                if (productIndex !== -1) {
+                    products[productIndex] = updatedProduct;
+                }
+                listElement.innerHTML = products.map(product => `
+                    <li>
+                        ${product.title} (ID: ${product.id}) [${product.price || 0} $]
+                        <button class="patch-btn" data-id="${product.id}">Изменить</button>
+                        <button class="delete-btn" data-id="${product.id}">Удалить</button>
+                    </li>
+                `).join('');
+            },
+            delete: async (listElement, id) => {
+                await fetch(`https://dummyjson.com/products/${id}`, {
+                    method: 'DELETE'
+                });
+                const updatedResponse = await fetch('https://dummyjson.com/products?limit=5', { method: 'GET' });
+                const { products } = await updatedResponse.json();
+                listElement.innerHTML = products.map(product => `
+                    <li>
+                        ${product.title} (ID: ${product.id}) [${product.price || 0} $]
+                        <button class="patch-btn" data-id="${product.id}">Изменить</button>
+                        <button class="delete-btn" data-id="${product.id}">Удалить</button>
+                    </li>
+                `).join('');
+            }
+        }
+    }
+};
+
+function setupApiSection(sectionId, apiKey) {
+    const listElement = document.getElementById(`${sectionId}-list`);
+    const loader = document.querySelector(`#${sectionId}-section .loader`);
+    const buttons = document.querySelectorAll(`#${sectionId}-section .controls button`);
+
+    const initialLoad = async () => {
+        listElement.innerHTML = '<li>Выполняется...</li>';
+        await new Promise(resolve => setTimeout(resolve, 500));
         try {
-            const response = await fetch('https://restcountries.com/v3.1/all?fields=name,capital');
-            const countries = await response.json();
+            await apiHandlers[apiKey].methods.get(listElement);
             loader.remove();
-            countriesList.innerHTML = countries.slice(0, 5).map(country => `<li>${country.name.common} - ${country.capital?.[0] || 'Нет столицы'}</li>`).join('');
+            setupActions();
         } catch (error) {
             loader.remove();
-            countriesList.innerHTML = `<li>Ошибка: ${error.message}</li>`;
+            listElement.innerHTML = `<li>Ошибка: ${error.message}</li>`;
+        }
+    };
+
+    initialLoad();
+
+    buttons.forEach(button => {
+        const method = button.dataset.method;
+        if (method) {
+            button.addEventListener('click', async () => {
+                listElement.innerHTML = '<li>Выполняется...</li>';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                try {
+                    await apiHandlers[apiKey].methods[method](listElement);
+                    loader.remove();
+                    setupActions();
+                } catch (error) {
+                    loader.remove();
+                    listElement.innerHTML = `<li>Ошибка: ${error.message}</li>`;
+                }
+            });
         }
     });
-}
 
-function setupUsersSection() {
-    const usersList = document.getElementById('users-list');
-    const loader = document.querySelector('#users-section .loader');
-    const buttons = document.querySelectorAll('#users-section .controls button');
-
-    buttons.forEach(button => {
-        button.addEventListener('click', async () => {
-            const method = button.dataset.method;
-            usersList.innerHTML = '<li>Выполняется...</li>';
-
-            try {
-                if (method === 'get') {
-                    const response = await fetch('https://reqres.in/api/users?page=1&per_page=5');
-                    const { data: users } = await response.json();
+    function setupActions() {
+        document.querySelectorAll(`#${sectionId}-list .patch-btn`).forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                listElement.innerHTML = '<li>Выполняется...</li>';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                try {
+                    await apiHandlers[apiKey].methods.patch(listElement, id);
                     loader.remove();
-                    usersList.innerHTML = users.map(user => `<li>${user.first_name} ${user.last_name}</li>`).join('');
-                } else if (method === 'post') {
-                    const response = await fetch('https://reqres.in/api/users', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: 'Kai' })
-                    });
-                    const data = await response.json();
+                    setupActions();
+                } catch (error) {
                     loader.remove();
-                    usersList.innerHTML = `<li>Создан пользователь: ${data.name}</li>`;
-                } else if (method === 'put') {
-                    const response = await fetch('https://reqres.in/api/users/2', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: 'Kai Angel' })
-                    });
-                    const data = await response.json();
-                    loader.remove();
-                    usersList.innerHTML = `<li>Обновлен пользователь: ${data.name}</li>`;
-                } else if (method === 'patch') {
-                    const response = await fetch('https://reqres.in/api/users/2', {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: '9mice?????' })
-                    });
-                    const data = await response.json();
-                    loader.remove();
-                    usersList.innerHTML = `<li>Изменен пользователь: ${data.name}</li>`;
-                } else if (method === 'delete') {
-                    await fetch('https://reqres.in/api/users/2', {
-                        method: 'DELETE'
-                    });
-                    loader.remove();
-                    usersList.innerHTML = `<li>Пользователь удален((</li>`;
+                    listElement.innerHTML = `<li>Ошибка: ${error.message}</li>`;
                 }
-            } catch (error) {
-                loader.remove();
-                usersList.innerHTML = `<li>Ошибка: ${error.message}</li>`;
-            }
+            });
         });
-    });
-}
 
-function setupProductsSection() {
-    const productsList = document.getElementById('products-list');
-    const loader = document.querySelector('#products-section .loader');
-    const buttons = document.querySelectorAll('#products-section .controls button');
-
-    buttons.forEach(button => {
-        button.addEventListener('click', async () => {
-            const method = button.dataset.method;
-            productsList.innerHTML = '<li>Выполняется...</li>';
-
-            try {
-                if (method === 'get') {
-                    const response = await fetch('https://dummyjson.com/products?limit=5');
-                    const { products } = await response.json();
+        document.querySelectorAll(`#${sectionId}-list .delete-btn`).forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                listElement.innerHTML = '<li>Выполняется...</li>';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                try {
+                    await apiHandlers[apiKey].methods.delete(listElement, id);
                     loader.remove();
-                    productsList.innerHTML = products.map(product => `<li>${product.title}</li>`).join('');
-                } else if (method === 'post') {
-                    const response = await fetch('https://dummyjson.com/products/add', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ title: 'зипочка vetements' })
-                    });
-                    const data = await response.json();
+                    setupActions();
+                } catch (error) {
                     loader.remove();
-                    productsList.innerHTML = `<li>Создан продукт: ${data.title}</li>`;
-                } else if (method === 'put') {
-                    const response = await fetch('https://dummyjson.com/products/1', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ title: 'новая зипоччччка' })
-                    });
-                    const data = await response.json();
-                    loader.remove();
-                    productsList.innerHTML = `<li>Обновлен продукт: ${data.title}</li>`;
-                } else if (method === 'patch') {
-                    const response = await fetch('https://dummyjson.com/products/1', {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ price: 99999 })
-                    });
-                    const data = await response.json();
-                    loader.remove();
-                    productsList.innerHTML = `<li>Изменен продукт, новая цена: ${data.price} ₽</li>`;
-                } else if (method === 'delete') {
-                    const response = await fetch('https://dummyjson.com/products/1', {
-                        method: 'DELETE'
-                    });
-                    const data = await response.json();
-                    loader.remove();
-                    productsList.innerHTML = `<li>Продукт удален (ID: ${data.id}) ( а зачем тебе его айдишник?)) )</li>`;
+                    listElement.innerHTML = `<li>Ошибка: ${error.message}</li>`;
                 }
-            } catch (error) {
-                loader.remove();
-                productsList.innerHTML = `<li>Ошибка: ${error.message}</li>`;
-            }
+            });
         });
-    });
+    }
 }
 
 function buildSite(playMusic = false) {
     const blocks = [
-        new HeaderBlock('header', 'Kai Angel', 'Российский рэпер', './img/kai_angel.jpg'),
-        new StatsBlock('stats', {
-            'Настоящее имя': 'Дмитрий Ицков',
-            'Дата рождения': '4 февраля 1997',
-            'Город': 'Брянск, Россия',
-            'Жанр': 'Хип-хоп / Рэп'
-        }, 'Kai Angel — российский рэп-исполнитель, продюсер и участник дуэта VIPERR. Известен своим уникальным стилем и мрачной эстетикой.'),
-        new CollabsBlock('collabs', [
-            '9mice - "LIPSTICK"',
-            '9mice - "ОТРАВЛЕН ТОБОЙ"',
-            '9mice - "HEAVY METAL"',
-            '9mice - "Phoenix"',
-            '9mice - "Ринопластика"',
-            'Егор Крид, 9mice - "HELL"'
-        ]),
-        new AlbumsBlock('albums', [
-            { title: 'Heavy Metal 2', cover: './img/heavy_metal_2.jpg' },
-            { title: 'GOD SYSTEM', cover: './img/god_system.jpg' },
-            { title: 'ANGEL MAY CRY', cover: './img/angel_may_cry.jpg' }
-        ]),
-        new TicketBlock('ticket', './img/kai_angel_ticket.jpg'),
-        new QuotesBlock('quotes', [
-            'Она в моей голове навсегда (навсегда)',
-            'Сколько можно быть тут одному? — я задаю себе question',
-            'Красный свет в глазах, я живу во тьме'
-        ]),
-        new FooterBlock('footer', 'Kai Angel — восходящая звезда российской сцены', 'https://music.yandex.ru/artist/16509384')
+        { id: 'header', create: () => new HeaderBlock('header', 'Kai Angel', 'Российский рэпер', './img/kai_angel.jpg') },
+        {
+            id: 'stats',
+            create: () =>
+                new StatsBlock('stats', {
+                    'Настоящее имя': 'Дмитрий Ицков',
+                    'Дата рождения': '4 февраля 1997',
+                    'Город': 'Брянск, Россия',
+                    'Жанр': 'Хип-хоп / Рэп'
+                }, 'Kai Angel — российский рэп-исполнитель, продюсер и участник дуэта VIPERR. Известен своим уникальным стилем и мрачной эстетикой.')
+        },
+        {
+            id: 'collabs',
+            create: () =>
+                new CollabsBlock('collabs', [
+                    '9mice - "LIPSTICK"',
+                    '9mice - "ОТРАВЛЕН ТОБОЙ"',
+                    '9mice - "HEAVY METAL"',
+                    '9mice - "Phoenix"',
+                    '9mice - "Ринопластика"',
+                    'Егор Крид, 9mice - "HELL"'
+                ])
+        },
+        {
+            id: 'albums',
+            create: () =>
+                new AlbumsBlock('albums', [
+                    { title: 'Heavy Metal 2', cover: './img/heavy_metal_2.jpg' },
+                    { title: 'GOD SYSTEM', cover: './img/god_system.jpg' },
+                    { title: 'ANGEL MAY CRY', cover: './img/angel_may_cry.jpg' }
+                ])
+        },
+        { id: 'ticket', create: () => new TicketBlock('ticket', './img/kai_angel_ticket.jpg') },
+        {
+            id: 'quotes',
+            create: () =>
+                new QuotesBlock('quotes', [
+                    'Она в моей голове навсегда (навсегда)',
+                    'Сколько можно быть тут одному? — я задаю себе question',
+                    'Красный свет в глазах, я живу во тьме'
+                ])
+        },
+        { id: 'footer', create: () => new FooterBlock('footer', 'Kai Angel — восходящая звезда российской сцены', 'https://music.yandex.ru/artist/16509384') }
     ];
 
-    const mainBlocks = blocks.filter(block => !(block instanceof HeaderBlock) && !(block instanceof FooterBlock));
-    const headerBlock = blocks.find(block => block instanceof HeaderBlock);
-    const footerBlock = blocks.find(block => block instanceof FooterBlock);
+    const mainBlocks = blocks.filter(block => block.id !== 'header' && block.id !== 'footer');
+    const headerBlock = blocks.find(block => block.id === 'header');
+    const footerBlock = blocks.find(block => block.id === 'footer');
 
     document.body.innerHTML = `
-        ${headerBlock.getHTML()}
+        ${headerBlock.create().getHTML()}
         <nav class="nav-block">
             <ul>
                 <li><a href="#countries-section">Страны</a></li>
@@ -330,7 +540,7 @@ function buildSite(playMusic = false) {
             </ul>
         </nav>
         <main>
-            ${mainBlocks.map(block => block.getHTML()).join('')}
+            ${mainBlocks.map(block => block.create().getHTML()).join('')}
             <section id="countries-section" class="api-section">
                 <p class="api-warning">Внимание, API абсолютно рандомные и отношения к сайту практически не имеют!!!</p>
                 <h2>Страны</h2>
@@ -347,8 +557,6 @@ function buildSite(playMusic = false) {
                     <button data-method="get">GET</button>
                     <button data-method="post">POST</button>
                     <button data-method="put">PUT</button>
-                    <button data-method="patch">PATCH</button>
-                    <button data-method="delete">DELETE</button>
                 </div>
                 <ul id="users-list"></ul>
             </section>
@@ -359,19 +567,17 @@ function buildSite(playMusic = false) {
                     <button data-method="get">GET</button>
                     <button data-method="post">POST</button>
                     <button data-method="put">PUT</button>
-                    <button data-method="patch">PATCH</button>
-                    <button data-method="delete">DELETE</button>
                 </div>
                 <ul id="products-list"></ul>
             </section>
         </main>
-        ${footerBlock.getHTML()}
+        ${footerBlock.create().getHTML()}
         ${playMusic ? '<audio id="background-music" autoplay loop src="./audio/9mice_anora.mp3"></audio>' : ''}
     `;
 
-    setupCountriesSection();
-    setupUsersSection();
-    setupProductsSection();
+    setupApiSection('countries', 'countries');
+    setupApiSection('users', 'users');
+    setupApiSection('products', 'products');
 }
 
 function showIntroPopup() {
