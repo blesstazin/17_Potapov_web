@@ -21,14 +21,12 @@ const ApiSection = ({ apiKey, title }) => {
         } else if (method === 'patch') {
             const promptText = apiKey === 'products' ? 'цену' : 'имя';
             if (!id) {
-                // Для пользовательских элементов запрашиваем ID
                 const customId = prompt('Введите ID для изменения:');
                 if (!customId) return;
                 const newValue = prompt(`Введите новое ${promptText}:`);
                 if (!newValue) return;
                 await apiHandlers[apiKey].patch(customId, newValue);
             } else {
-                // Для не пользовательских элементов сразу запрашиваем значение
                 const newValue = prompt(`Введите новое ${promptText}:`);
                 if (!newValue) return;
                 await apiHandlers[apiKey].patch(id, newValue);

@@ -2,29 +2,50 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const ApiContext = createContext();
 
+// Конфигурация API
+const apiConfig = {
+    countries: {
+        url: 'https://restcountries.com/v3.1/all?fields=name,capital',
+        transform: data => data.slice(0, 5),
+        methods: ['get']
+    },
+    users: {
+        url: 'https://reqres.in/api/users?per_page=5',
+        transform: data => data.data,
+        methods: ['get', 'post', 'put', 'patch', 'delete'],
+        baseUrl: 'https://reqres.in/api/users'
+    },
+    products: {
+        url: 'https://dummyjson.com/products?limit=5',
+        transform: data => data.products,
+        methods: ['get', 'post', 'put', 'patch', 'delete'],
+        baseUrl: 'https://dummyjson.com/products'
+    }
+};
+
 export const ApiProvider = ({ children }) => {
-    const [countries, setCountries] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState({ countries: true, users: true, products: true });
+    const [data, setData] = useState({
+        countries: [],
+        users: [],
+        products: []
+    });
+    const [loading, setLoading] = useState({
+        countries: true,
+        users: true,
+        products: true
+    });
 
     const fetchData = async (key) => {
+        const config = apiConfig[key];
+        if (!config) return;
+
         setLoading(prev => ({ ...prev, [key]: true }));
         try {
-            if (key === 'countries') {
-                const res = await fetch('https://restcountries.com/v3.1/all?fields=name,capital');
-                const data = await res.json();
-                setCountries(data.slice(0, 5));
-            } else if (key === 'users') {
-                const res = await fetch('https://reqres.in/api/users?per_page=5');
-                const { data } = await res.json();
-                setUsers(data);
-            } else if (key === 'products') {
-                const res = await fetch('https://dummyjson.com/products?limit=5');
-                const { products } = await res.json();
-                setProducts(products);
-            }
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const res = await fetch(config.url);
+            const rawData = await res.json();
+            const transformedData = config.transform ? config.transform(rawData) : rawData;
+            setData(prev => ({ ...prev, [key]: transformedData }));
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Задержка для наглядности
         } catch (error) {
             console.error(`Ошибка при загрузке ${key}:`, error);
         } finally {
@@ -33,117 +54,151 @@ export const ApiProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        fetchData('countries');
-        fetchData('users');
-        fetchData('products');
+        Object.keys(apiConfig).forEach(key => fetchData(key));
     }, []);
 
     const apiHandlers = {
         countries: {
             get: () => fetchData('countries'),
-            set: setCountries
+            set: newData => setData(prev => ({ ...prev, countries: newData }))
         },
         users: {
             get: () => fetchData('users'),
-            set: setUsers,
+            set: newData => setData(prev => ({ ...prev, users: newData })),
             post: async (name) => {
-                const res = await fetch('https://reqres.in/api/users', {
+                const res = await fetch(`${apiConfig.users.baseUrl}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name })
                 });
                 const newUser = await res.json();
                 const nameParts = name.split(' ');
-                setUsers([{ id: Date.now(), first_name: nameParts[0], last_name: nameParts[1] || '', isCustom: true }, ...users.slice(0, 4)]);
+                setData(prev => ({
+                    ...prev,
+                    users: [{ id: Date.now(), first_name: nameParts[0], last_name: nameParts[1] || '', isCustom: true }, ...prev.users.slice(0, 4)]
+                }));
             },
             put: async (id, newName) => {
                 const numericId = parseInt(id);
-                const isCustom = users.find(u => u.id === numericId)?.isCustom;
+                const isCustom = data.users.find(u => u.id === numericId)?.isCustom;
                 if (!isCustom) {
-                    await fetch(`https://reqres.in/api/users/${id}`, {
+                    await fetch(`${apiConfig.users.baseUrl}/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: newName })
                     });
                     const nameParts = newName.split(' ');
-                    setUsers(users.map(user => user.id === numericId ? { ...user, first_name: nameParts[0], last_name: nameParts[1] || '' } : user));
+                    setData(prev => ({
+                        ...prev,
+                        users: prev.users.map(user => user.id === numericId ? { ...user, first_name: nameParts[0], last_name: nameParts[1] || '' } : user)
+                    }));
                 } else {
                     const nameParts = newName.split(' ');
-                    setUsers(users.map(user => user.id === numericId ? { ...user, first_name: nameParts[0], last_name: nameParts[1] || '' } : user));
+                    setData(prev => ({
+                        ...prev,
+                        users: prev.users.map(user => user.id === numericId ? { ...user, first_name: nameParts[0], last_name: nameParts[1] || '' } : user)
+                    }));
                 }
             },
             patch: async (id, newName) => {
                 const numericId = parseInt(id);
-                const isCustom = users.find(u => u.id === numericId)?.isCustom;
+                const isCustom = data.users.find(u => u.id === numericId)?.isCustom;
                 if (!isCustom) {
-                    await fetch(`https://reqres.in/api/users/${id}`, {
+                    await fetch(`${apiConfig.users.baseUrl}/${id}`, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: newName })
                     });
-                    setUsers(users.map(user => user.id === numericId ? { ...user, first_name: newName } : user));
+                    setData(prev => ({
+                        ...prev,
+                        users: prev.users.map(user => user.id === numericId ? { ...user, first_name: newName } : user)
+                    }));
                 } else {
-                    setUsers(users.map(user => user.id === numericId ? { ...user, first_name: newName } : user));
+                    setData(prev => ({
+                        ...prev,
+                        users: prev.users.map(user => user.id === numericId ? { ...user, first_name: newName } : user)
+                    }));
                 }
             },
             delete: async (id) => {
                 const numericId = parseInt(id);
-                await fetch(`https://reqres.in/api/users/${id}`, { method: 'DELETE' });
-                setUsers(users.filter(user => user.id !== numericId));
+                await fetch(`${apiConfig.users.baseUrl}/${id}`, { method: 'DELETE' });
+                setData(prev => ({
+                    ...prev,
+                    users: prev.users.filter(user => user.id !== numericId)
+                }));
             }
         },
         products: {
             get: () => fetchData('products'),
-            set: setProducts,
+            set: newData => setData(prev => ({ ...prev, products: newData })),
             post: async (title) => {
-                const res = await fetch('https://dummyjson.com/products/add', {
+                const res = await fetch(`${apiConfig.products.baseUrl}/add`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title })
                 });
                 const newProduct = await res.json();
-                setProducts([{ id: Date.now(), title, price: 0, isCustom: true }, ...products.slice(0, 4)]);
+                setData(prev => ({
+                    ...prev,
+                    products: [{ id: Date.now(), title, price: 0, isCustom: true }, ...prev.products.slice(0, 4)]
+                }));
             },
             put: async (id, newTitle) => {
                 const numericId = parseInt(id);
-                const isCustom = products.find(p => p.id === numericId)?.isCustom;
+                const isCustom = data.products.find(p => p.id === numericId)?.isCustom;
                 if (!isCustom) {
-                    const res = await fetch(`https://dummyjson.com/products/${id}`, {
+                    const res = await fetch(`${apiConfig.products.baseUrl}/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ title: newTitle })
                     });
                     const updatedProduct = await res.json();
-                    setProducts(products.map(product => product.id === numericId ? { ...product, title: updatedProduct.title } : product));
+                    setData(prev => ({
+                        ...prev,
+                        products: prev.products.map(product => product.id === numericId ? { ...product, title: updatedProduct.title } : product)
+                    }));
                 } else {
-                    setProducts(products.map(product => product.id === numericId ? { ...product, title: newTitle } : product));
+                    setData(prev => ({
+                        ...prev,
+                        products: prev.products.map(product => product.id === numericId ? { ...product, title: newTitle } : product)
+                    }));
                 }
             },
             patch: async (id, newPrice) => {
                 const numericId = parseInt(id);
-                const isCustom = products.find(p => p.id === numericId)?.isCustom;
+                const isCustom = data.products.find(p => p.id === numericId)?.isCustom;
                 if (!isCustom) {
-                    const res = await fetch(`https://dummyjson.com/products/${id}`, {
+                    const res = await fetch(`${apiConfig.products.baseUrl}/${id}`, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ price: parseInt(newPrice) })
                     });
                     const updatedProduct = await res.json();
-                    setProducts(products.map(product => product.id === numericId ? { ...product, price: updatedProduct.price } : product));
+                    setData(prev => ({
+                        ...prev,
+                        products: prev.products.map(product => product.id === numericId ? { ...product, price: updatedProduct.price } : product)
+                    }));
                 } else {
-                    setProducts(products.map(product => product.id === numericId ? { ...product, price: parseInt(newPrice) } : product));
+                    setData(prev => ({
+                        ...prev,
+                        products: prev.products.map(product => product.id === numericId ? { ...product, price: parseInt(newPrice) } : product)
+                    }));
                 }
             },
             delete: async (id) => {
                 const numericId = parseInt(id);
-                await fetch(`https://dummyjson.com/products/${id}`, { method: 'DELETE' });
-                setProducts(products.filter(product => product.id !== numericId));
+                await fetch(`${apiConfig.products.baseUrl}/${id}`, { method: 'DELETE' });
+                setData(prev => ({
+                    ...prev,
+                    products: prev.products.filter(product => product.id !== numericId)
+                }));
             }
         }
     };
 
     return (
-        <ApiContext.Provider value={{ countries, users, products, apiHandlers, loading }}>
+        <ApiContext.Provider value={{ ...data, apiHandlers, loading }}>
             {children}
         </ApiContext.Provider>
     );
