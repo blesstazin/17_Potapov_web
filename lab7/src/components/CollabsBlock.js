@@ -1,6 +1,6 @@
 import React from 'react';
 
-function CollabsBlock() {
+const CollabsBlock = () => {
     const collabs = [
         '9mice - "LIPSTICK"',
         '9mice - "ОТРАВЛЕН ТОБОЙ"',
@@ -11,7 +11,7 @@ function CollabsBlock() {
     ];
 
     return (
-        <section className="collabs-block" id="collabs">
+        <section className="collabs-block">
             <h2>Коллаборации</h2>
             <ul>
                 {collabs.map((collab, index) => (
@@ -20,6 +20,6 @@ function CollabsBlock() {
             </ul>
         </section>
     );
-}
+};
 
 export default CollabsBlock;

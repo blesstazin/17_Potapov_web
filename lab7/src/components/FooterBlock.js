@@ -1,8 +1,8 @@
 import React from 'react';
 
-function FooterBlock() {
+const FooterBlock = () => {
     return (
-        <footer className="footer-block" id="footer">
+        <footer className="footer-block">
             <p>
                 Kai Angel — восходящая звезда российской сцены |{' '}
                 <a href="https://music.yandex.ru/artist/16509384" target="_blank" rel="noopener noreferrer">
@@ -11,6 +11,6 @@ function FooterBlock() {
             </p>
         </footer>
     );
-}
+};
 
 export default FooterBlock;

@@ -1,17 +1,17 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-function NavBlock() {
+const NavBlock = () => {
     return (
         <nav className="nav-block">
             <ul>
-                <li><NavLink to="/">Главная</NavLink></li>
-                <li><NavLink to="/countries">Страны</NavLink></li>
-                <li><NavLink to="/users">Пользователи</NavLink></li>
-                <li><NavLink to="/products">Продукты</NavLink></li>
+                <li><Link to="/">Главная</Link></li>
+                <li><Link to="/countries">Страны</Link></li>
+                <li><Link to="/users">Пользователи</Link></li>
+                <li><Link to="/products">Продукты</Link></li>
             </ul>
         </nav>
     );
-}
+};
 
 export default NavBlock;

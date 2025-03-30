@@ -1,6 +1,6 @@
 import React from 'react';
 
-function QuotesBlock() {
+const QuotesBlock = () => {
     const quotes = [
         'Она в моей голове навсегда (навсегда)',
         'Сколько можно быть тут одному? — я задаю себе question',
@@ -8,7 +8,7 @@ function QuotesBlock() {
     ];
 
     return (
-        <section className="quotes-block" id="quotes">
+        <section className="quotes-block">
             <h2>Цитаты из песен</h2>
             <ul>
                 {quotes.map((quote, index) => (
@@ -17,6 +17,6 @@ function QuotesBlock() {
             </ul>
         </section>
     );
-}
+};
 
 export default QuotesBlock;

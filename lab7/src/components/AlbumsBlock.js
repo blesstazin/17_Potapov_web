@@ -1,6 +1,6 @@
 import React from 'react';
 
-function AlbumsBlock() {
+const AlbumsBlock = () => {
     const albums = [
         { title: 'Heavy Metal 2', cover: '/img/heavy_metal_2.jpg' },
         { title: 'GOD SYSTEM', cover: '/img/god_system.jpg' },
@@ -8,7 +8,7 @@ function AlbumsBlock() {
     ];
 
     return (
-        <section className="albums-block" id="albums">
+        <section className="albums-block">
             <h2>Популярные альбомы</h2>
             <ul>
                 {albums.map((album, index) => (
@@ -20,6 +20,6 @@ function AlbumsBlock() {
             </ul>
         </section>
     );
-}
+};
 
 export default AlbumsBlock;
